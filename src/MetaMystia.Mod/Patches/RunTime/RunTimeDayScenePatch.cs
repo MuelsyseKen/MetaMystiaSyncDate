@@ -48,4 +48,18 @@ public partial class RunTimeDayScenePatch
     [HarmonyPatch(nameof(RunTimeDayScene.SetupDay))]
     [HarmonyPostfix]
     public static void SetupDay_Postfix(System.Action onDayEnd) => DayTimeManager.RefreshAndBroadcast();
+
+    // 以下三个是 RemainActions 可能被直接改动、但不经过 OnTimePassInternal 的口子（跳过事件/剧情等）。
+    // 临时兜底：在换成读取游戏原生时钟前，先保证这些路径也不会漏刷新。
+    [HarmonyPatch(nameof(RunTimeDayScene.SetActions))]
+    [HarmonyPostfix]
+    public static void SetActions_Postfix(int actions) => DayTimeManager.RefreshAndBroadcast();
+
+    [HarmonyPatch(nameof(RunTimeDayScene.WarpActions))]
+    [HarmonyPostfix]
+    public static void WarpActions_Postfix(int actions, System.Action<System.Action> onCustomEventFinish) => DayTimeManager.RefreshAndBroadcast();
+
+    [HarmonyPatch(nameof(RunTimeDayScene.WarpHours))]
+    [HarmonyPostfix]
+    public static void WarpHours_Postfix(int hours, System.Action<System.Action> onCustomEventFinish) => DayTimeManager.RefreshAndBroadcast();
 }

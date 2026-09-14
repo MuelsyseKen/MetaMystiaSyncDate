@@ -8,10 +8,15 @@ namespace MetaMystia;
 /// <summary>
 /// 负责计算本地玩家当前的日期+时间展示文本，并在其发生变化时广播给其他玩家。
 ///
-/// 时间部分的计算基于玩家口述的实测规则（并非逆向确认）：
-/// 白天场景固定从 10:00 开始，每消耗 1 次行动（RemainActions 减 1）视为 +30 分钟，
-/// 18:00 为开店时间。若实际游戏表现与此不符，请调整 <see cref="DayStartHour"/>
-/// 和 <see cref="MinutesPerAction"/>。
+/// ⚠️ 临时方案：目前没有找到游戏原生存储"当前白天时钟（时:分）"的字段，
+/// 时间部分是按玩家口述的规则（10:00 开始，每消耗 1 个行动单位 +30 分钟）
+/// 从 RemainActions 反推的，不是直接读取游戏真实状态。行动消耗的单位数
+/// 由游戏原生结算（如一次烹饪多份可能一次性消耗 2 个单位），本实现每次都
+/// 重新读取结算后的 RemainActions 而非自行累加，所以能覆盖"一次消耗超过
+/// 30 分钟"的情况——但仍依赖 RunTimeDayScenePatch 里挂的这几个 Postfix
+/// 覆盖了所有会改动 RemainActions 的入口。一旦找到游戏原生的当前时钟来源
+/// （如 FastTravelPanel_New 构造 TimeIndicatorContext 时用的字段），
+/// 应改为直接读取该值，废弃这里的近似算法。
 /// </summary>
 [AutoLog]
 public static partial class DayTimeManager
@@ -28,7 +33,7 @@ public static partial class DayTimeManager
         try
         {
             var date = RunTimePlayerData.Date;
-            string dateText = $"{date.Month}月{date.Day}日{date.DaysOfTheWeek}";
+            string dateText = $"{date.Year}年{date.Month}月{date.Day}日{date.DaysOfTheWeek}";
 
             int totalActions = RunTimeDayScene.GetTotalActions();
             int remainActions = RunTimeDayScene.RemainActions;
