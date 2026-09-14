@@ -70,6 +70,7 @@ public enum ActionType : ushort
     DayDestinationConfirm,
     YuyukoGuest,
     YuyukoGuestBound,
+    DayTimeSync,
 }
 
 [MemoryPackable]
@@ -126,6 +127,7 @@ public enum ActionType : ushort
 [MemoryPackUnion((ushort)ActionType.DayDestinationConfirm, typeof(DayDestinationConfirmAction))]
 [MemoryPackUnion((ushort)ActionType.YuyukoGuest, typeof(YuyukoGuestAction))]
 [MemoryPackUnion((ushort)ActionType.YuyukoGuestBound, typeof(YuyukoGuestBoundAction))]
+[MemoryPackUnion((ushort)ActionType.DayTimeSync, typeof(DayTimeSyncAction))]
 [AutoLog]
 
 public abstract partial class Action

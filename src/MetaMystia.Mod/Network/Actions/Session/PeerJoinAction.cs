@@ -36,6 +36,7 @@ public partial class PeerJoinAction : Action
         {
             peer.IsDayOver = PeerInfo.IsDayOver;
             peer.IsPrepOver = PeerInfo.IsPrepOver;
+            peer.DayTimeText = PeerInfo.DayTimeText;
         }
         InGameConsole.ShowPassiveFromAnyThread(TextId.PeerJoined.Get(LiveModeManager.GetDisplayName(PeerInfo.Uid)));
     }

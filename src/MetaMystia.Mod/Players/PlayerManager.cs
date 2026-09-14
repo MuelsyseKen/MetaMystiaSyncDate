@@ -257,6 +257,7 @@ public static partial class PlayerManager
         peer.ResetState();
         peer.IsDayOver = info.IsDayOver;
         peer.IsPrepOver = info.IsPrepOver;
+        peer.DayTimeText = info.DayTimeText;
         peer.ResetMotion();
         Peers[uid] = peer;
         Log.LogMessage($"Added peer '{peerId}' (uid={uid}, characterId='{peer.CharacterId}')");

@@ -14,6 +14,7 @@ public partial class PlayerInfo
     public PlayerSkin Skin { get; set; }
     public bool IsDayOver { get; set; }
     public bool IsPrepOver { get; set; }
+    public string DayTimeText { get; set; } = "";
 
     public static PlayerInfo FromPlayer(NetPlayer player)
     {
@@ -24,7 +25,8 @@ public partial class PlayerInfo
             IncrementalDataBase = player.IncrementalDataBase,
             Skin = player.Skin,
             IsDayOver = player.IsDayOver,
-            IsPrepOver = player.IsPrepOver
+            IsPrepOver = player.IsPrepOver,
+            DayTimeText = player.DayTimeText
         };
     }
 }

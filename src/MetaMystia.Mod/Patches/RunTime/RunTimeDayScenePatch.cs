@@ -34,4 +34,18 @@ public partial class RunTimeDayScenePatch
                    || !RunTimeStorage.Recipes.Contains(m.productId))
             .ToIl2CppReferenceArray();
     }
+
+    /// <summary>
+    /// 行动次数变化（收集/烹饪/传送等消耗行动）后，刷新并广播当前日期+时间展示文本。
+    /// </summary>
+    [HarmonyPatch(nameof(RunTimeDayScene.OnTimePassInternal))]
+    [HarmonyPostfix]
+    public static void OnTimePassInternal_Postfix(int actions) => DayTimeManager.RefreshAndBroadcast();
+
+    /// <summary>
+    /// 新的一天开始（行动次数重置）后，刷新并广播当前日期+时间展示文本。
+    /// </summary>
+    [HarmonyPatch(nameof(RunTimeDayScene.SetupDay))]
+    [HarmonyPostfix]
+    public static void SetupDay_Postfix(System.Action onDayEnd) => DayTimeManager.RefreshAndBroadcast();
 }

@@ -77,6 +77,12 @@ public abstract partial class NetPlayer
     public bool IsPrepOver { get; set; } = false;
 
     /// <summary>
+    /// 白天场景当前日期+时间的展示文本（如 "1月5日星期五 10:00"），仅用于玩家列表面板展示。
+    /// 由 <see cref="DayTimeManager"/> 在本地计算并通过 <see cref="MetaMystia.Network.DayTimeSyncAction"/> 同步。
+    /// </summary>
+    public string DayTimeText { get; set; } = "";
+
+    /// <summary>
     /// 选择的居酒屋地图（选店阶段）
     /// </summary>
     public MapLabel IzakayaMapLabel { get; set; } = MapLabel.Unknown;
@@ -147,6 +153,7 @@ public abstract partial class NetPlayer
         IsPrepOver = false;
         IzakayaMapLabel = MapLabel.Unknown;
         IzakayaLevel = 0;
+        DayTimeText = "";
     }
 
     /// <summary>

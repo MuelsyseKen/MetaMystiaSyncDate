@@ -149,6 +149,7 @@ public static partial class PlayerListPanel
             needsGameplayData ? local.Position : Vector2.zero,
             local.IsDayOver, local.IsPrepOver,
             local.IzakayaMapLabel, local.IzakayaLevel,
+            local.DayTimeText,
             isSelf: true, isHost: MpManager.IsServer);
         lines.Add((localLine, local.Uid));
 
@@ -163,6 +164,7 @@ public static partial class PlayerListPanel
                 needsGameplayData ? peer.Position : Vector2.zero,
                 peer.IsDayOver, peer.IsPrepOver,
                 peer.IzakayaMapLabel, peer.IzakayaLevel,
+                peer.DayTimeText,
                 isSelf: false, isHost: kvp.Key == MpManager.HOST_UID);
             lines.Add((line, kvp.Key));
         }
@@ -178,6 +180,7 @@ public static partial class PlayerListPanel
                 needsGameplayData ? peer.Position : Vector2.zero,
                 peer.IsDayOver, peer.IsPrepOver,
                 peer.IzakayaMapLabel, peer.IzakayaLevel,
+                peer.DayTimeText,
                 isSelf: false, isHost: false,
                 scopeTag: "Online");
             lines.Add((line, kvp.Key));
@@ -191,6 +194,7 @@ public static partial class PlayerListPanel
         MapLabel mapLabel, Vector2 pos,
         bool isDayOver, bool isPrepOver,
         MapLabel izakayaMapLabel, int izakayaLevel,
+        string dayTimeText,
         bool isSelf, bool isHost,
         string scopeTag = null)
     {
@@ -211,7 +215,7 @@ public static partial class PlayerListPanel
 
         return scene switch
         {
-            Scene.DayScene => FormatDayLine(name, dim, mapLabel, pos, isDayOver, izakayaMapLabel, izakayaLevel, uid, scopeTag == null),
+            Scene.DayScene => FormatDayLine(name, dim, mapLabel, pos, isDayOver, izakayaMapLabel, izakayaLevel, dayTimeText, uid, scopeTag == null),
             Scene.IzakayaPrepScene => scopeTag == null ? $"{name}  {ReadyTag(isPrepOver)}" : name,
             Scene.WorkScene when scopeTag == null && MpManager.IsConnected
                 && PrepSceneManager.IsYuyukoChallenge && PrepSceneManager.IsYuyukoPrepActive =>
@@ -226,21 +230,24 @@ public static partial class PlayerListPanel
     /// </summary>
     private static string FormatDayLine(string name, string dim,
         MapLabel mapLabel, Vector2 pos, bool isDayOver,
-        MapLabel izakayaMapLabel, int izakayaLevel, int uid, bool inRoom)
+        MapLabel izakayaMapLabel, int izakayaLevel, string dayTimeText, int uid, bool inRoom)
     {
+        // 日期+时间（每个玩家各自本地计算，通过网络同步；未同步到前为空，不显示）
+        string dayTime = string.IsNullOrEmpty(dayTimeText) ? "" : $"  <color={dim}>{dayTimeText}</color>";
+
         var destination = inRoom && MpManager.IsConnected ? DayDestinationManager.GetIntent(uid) : DayDestination.None;
         if (destination != DayDestination.None)
-            return $"{name}  <color={dim}>{mapLabel.GetDisplayName()}  ({pos.x:F2}, {pos.y:F2})</color>  {DayDestinationManager.ReadyText(destination)}";
+            return $"{name}  <color={dim}>{mapLabel.GetDisplayName()}  ({pos.x:F2}, {pos.y:F2})</color>{dayTime}  {DayDestinationManager.ReadyText(destination)}";
         if (!PlayerManager.AllDayOver)
         {
             // 仍在白天探索
-            return $"{name}  <color={dim}>{mapLabel.GetDisplayName()}  ({pos.x:F2}, {pos.y:F2})  {ReadyTag(isDayOver)}</color>";
+            return $"{name}  <color={dim}>{mapLabel.GetDisplayName()}  ({pos.x:F2}, {pos.y:F2})</color>{dayTime}  <color={dim}>{ReadyTag(isDayOver)}</color>";
         }
         // 全员进入选店
         string map = izakayaMapLabel.IsSelected()
             ? izakayaMapLabel.GetDisplayName() : "…";
         string level = izakayaLevel > 0 ? $" Lv.{izakayaLevel}" : "";
-        return $"{name}  <color={dim}>{map}{level}</color>";
+        return $"{name}  <color={dim}>{map}{level}</color>{dayTime}";
     }
 
     private static string ReadyTag(bool ready)
